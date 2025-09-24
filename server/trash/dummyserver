@@ -1,0 +1,43 @@
+const express = require("express");
+const cors = require("cors");
+
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+let users = [
+    { id: 1, name: 'Alice', age: 24, username: 'alice@example.com' },
+    { id: 2, name: 'Bob', age: 29, username: 'bob@example.com' },
+    { id: 3, name: 'Charlie', age: 32, username: 'charlie@example.com' },
+  ];
+
+app.get('/users',(req,res)=>{
+    if(users.length<=0) return res.send("EMPTY");
+    res.json(users);
+})
+app.post('/users',(req,res)=>{
+    const user = {id: Date.now(), name: req.body.name, age: req.body.age, username: req.body.username };
+    users.push(user);
+    res.status(201).json({
+        message : "User Created",
+        user
+    })
+})
+app.put('/users/:id',(req,res)=>{
+    const user = users.find(u=>u.id==req.params.id);
+    if(!user) res.status(404).send("user ID not found!!");
+    user.name = req.body.name;
+    res.json(user);
+})
+app.delete('/users/:id',(req,res)=>{
+    const user = users.findIndex(u=>u.id==req.params.id);
+    if(user===-1) return res.status(404).send("usernot found")
+
+    const deletedIndex = users.splice(user,1);
+    res.status(200).json({
+        message: "Deleted Success",
+        user: deletedIndex[0],
+    });
+})
+const PORT = 5000;
+app.listen(PORT,()=>{console.log(`Live server Started http://localhost:${PORT}`)})
