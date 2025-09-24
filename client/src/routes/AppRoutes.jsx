@@ -10,6 +10,7 @@ import LoginPage from "../pages/LoginPage";
 import ProtectedRoute from "../components/ProtectedRoute"; // import it
 import AddProduct from "../pages/admin/AddProduct";
 import RegisterPage from "../pages/Register";
+import ProductPage from "../features/products/ProductPage";
 
 const AppRoutes = () => {
   return (
@@ -19,6 +20,7 @@ const AppRoutes = () => {
       <Route path="/shop" element={<Shop />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/products/:id" element={<ProductPage />} />
 
       <Route path="/add-product" element={<AddProduct />} />
 

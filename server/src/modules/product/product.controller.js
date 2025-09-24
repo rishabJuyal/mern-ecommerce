@@ -75,15 +75,41 @@ exports.getProduct = async (req, res) => {
   }
 };
 
-exports.updateProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!product) return res.status(404).json({ error: "Product not found" });
-    res.json(product);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
+exports.updateProduct = [
+  upload.array("images", 5),
+  async (req, res) => {
+    try {
+      let imageUrls = [];
+      if (req.files && req.files.length > 0) {
+        // Upload new images
+        const uploaded = await Promise.all(
+          req.files.map(file => cloudinary.uploader.upload(file.path, { folder: "products" }))
+        );
+        imageUrls = uploaded.map(img => img.secure_url);
+        // Delete temp files
+        req.files.forEach(file => fs.unlinkSync(file.path));
+      }
+
+      // Build update object
+      const updateData = { ...req.body };
+      if (imageUrls.length > 0) {
+        updateData.images = imageUrls;
+      }
+
+      const product = await Product.findByIdAndUpdate(req.params.id, updateData, { new: true });
+      if (!product) return res.status(404).json({ error: "Product not found" });
+      res.json(product);
+
+    } catch (error) {
+      if (req.files) {
+        req.files.forEach(file => {
+          if (fs.existsSync(file.path)) fs.unlinkSync(file.path);
+        });
+      }
+      res.status(400).json({ error: error.message });
+    }
   }
-};
+];
 
 exports.deleteProduct = async (req, res) => {
   try {
