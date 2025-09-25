@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProductById, clearProductState } from "../../store/productSlice";
+import { addToCart, clearCartState } from "../../store/cartSlice";
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
 const ProductPage = () => {
@@ -13,11 +14,18 @@ const ProductPage = () => {
     (state) => state.products
   );
 
+  const { loading: cartLoading, error: cartError, success: cartSuccess } =
+    useSelector((state) => state.cart);
+
+  const [quantity, setQuantity] = useState(1);
+
   useEffect(() => {
     dispatch(fetchProductById(id));
+    dispatch(clearCartState()); // clear cart success/error on load
 
     return () => {
       dispatch(clearProductState());
+      dispatch(clearCartState());
     };
   }, [dispatch, id]);
 
@@ -33,6 +41,12 @@ const ProductPage = () => {
       }
     }
     return stars;
+  };
+
+  const handleAddToCart = () => {
+    if (quantity < 1) return;
+
+    dispatch(addToCart({ productId: id, quantity }));
   };
 
   if (loading)
@@ -135,13 +149,42 @@ const ProductPage = () => {
             <div className="text-4xl font-bold text-gray-900 mb-8">
               ${selectedProduct.price.toFixed(2)}
             </div>
+
+            {/* Quantity Input */}
+            {selectedProduct.stock > 0 && (
+              <div className="mb-6 flex items-center space-x-3">
+                <label htmlFor="quantity" className="font-semibold text-gray-700">
+                  Quantity:
+                </label>
+                <input
+                  id="quantity"
+                  type="number"
+                  min="1"
+                  max={selectedProduct.stock}
+                  value={quantity}
+                  onChange={(e) => {
+                    const val = Math.max(1, Math.min(selectedProduct.stock, Number(e.target.value)));
+                    setQuantity(val);
+                  }}
+                  className="w-20 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            )}
           </div>
 
           {/* Action Button */}
           <div>
             {selectedProduct.stock > 0 ? (
-              <button className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-md text-lg font-semibold shadow-lg transition">
-                Add to Cart
+              <button
+                onClick={handleAddToCart}
+                disabled={cartLoading}
+                className={`w-full ${
+                  cartLoading
+                    ? "bg-green-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                } text-white py-4 rounded-md text-lg font-semibold shadow-lg transition`}
+              >
+                {cartLoading ? "Adding..." : "Add to Cart"}
               </button>
             ) : (
               <button
@@ -150,6 +193,14 @@ const ProductPage = () => {
               >
                 Out of Stock
               </button>
+            )}
+
+            {/* Success/Error message */}
+            {cartSuccess && (
+              <p className="mt-4 text-green-600 font-medium">{cartSuccess}</p>
+            )}
+            {cartError && (
+              <p className="mt-4 text-red-600 font-medium">{cartError}</p>
             )}
           </div>
         </section>

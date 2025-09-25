@@ -3,7 +3,7 @@ import axios from "axios";
 import { refreshToken, clearAuth } from "../store/authSlice";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "http://192.168.147.127:5000/api",
   withCredentials: true, // for refresh token in httpOnly cookie
 });
 let store;
