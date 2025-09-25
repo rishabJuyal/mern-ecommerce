@@ -48,7 +48,11 @@ api.interceptors.response.use(
         window.location.href = "/login";
       }
     }
-
+    // Logout on 403 Forbidden
+    if (error.response?.status === 403) {
+      store.dispatch(clearAuth());
+      window.location.href = "/login";
+    }
     return Promise.reject(error);
   }
 );
