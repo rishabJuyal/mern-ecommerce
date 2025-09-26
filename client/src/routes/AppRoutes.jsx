@@ -4,13 +4,16 @@ import Home from "../pages/Home";
 import Shop from "../pages/Shop";
 import Cart from "../features/cart/Cart";
 import Wishlist from "../features/wishlist/Wishlist";
-import Orders from "../features/orders/Orders";
+// import Orders from "../features/orders/Orders";
+import Orders from "../pages/Orders";
 import Profile from "../pages/Profile";
 import LoginPage from "../pages/LoginPage";
 import ProtectedRoute from "../components/ProtectedRoute"; // import it
 import AddProduct from "../pages/admin/AddProduct";
 import RegisterPage from "../pages/Register";
 import ProductPage from "../features/products/ProductPage";
+import PaymentSuccess from "../pages/PaymentSuccess";
+import Checkout from "../pages/Checkout";
 
 const AppRoutes = () => {
   return (
@@ -30,7 +33,9 @@ const AppRoutes = () => {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/profile" element={<Profile />} />
-        {/* <Route path="/add-product" element={<AddProduct />} /> */}
+        <Route path="/checkout/cart" element={<Checkout />} />
+        <Route path="/checkout/product/:productId/:quantity" element={<Checkout />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
 
       </Route>
       <Route path="*" element={<div>Not Found</div>} />

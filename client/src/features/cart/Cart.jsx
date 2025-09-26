@@ -79,7 +79,7 @@ const Cart = () => {
 
           <div className="flex justify-end">
             <button
-              onClick={() => navigate("/checkout")}
+              onClick={() => navigate("/checkout/cart")}
               className="bg-blue-600 text-white px-6 py-3 rounded hover:bg-blue-700 transition"
             >
               Proceed to Checkout

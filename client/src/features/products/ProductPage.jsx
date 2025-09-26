@@ -49,6 +49,16 @@ const ProductPage = () => {
     dispatch(addToCart({ productId: id, quantity }));
   };
 
+  const handleBuyNow = () => {
+    if (quantity < 1) return;
+
+    // Add to cart first
+    dispatch(addToCart({ productId: id, quantity }));
+
+    // Redirect to checkout with productId and quantity
+    navigate(`/checkout/product/${id}/${quantity}`);
+  };
+
   if (loading)
     return (
       <div className="flex justify-center items-center h-64">
@@ -175,17 +185,31 @@ const ProductPage = () => {
           {/* Action Button */}
           <div>
             {selectedProduct.stock > 0 ? (
-              <button
-                onClick={handleAddToCart}
-                disabled={cartLoading}
-                className={`w-full ${
-                  cartLoading
-                    ? "bg-green-400 cursor-not-allowed"
-                    : "bg-green-600 hover:bg-green-700"
-                } text-white py-4 rounded-md text-lg font-semibold shadow-lg transition`}
-              >
-                {cartLoading ? "Adding..." : "Add to Cart"}
-              </button>
+              <>
+                <button
+                  onClick={handleAddToCart}
+                  disabled={cartLoading}
+                  className={`w-full ${
+                    cartLoading
+                      ? "bg-green-400 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700"
+                  } text-white py-4 rounded-md text-lg font-semibold shadow-lg transition`}
+                >
+                  {cartLoading ? "Adding..." : "Add to Cart"}
+                </button>
+
+                <button
+                  onClick={handleBuyNow}
+                  disabled={cartLoading}
+                  className={`mt-4 w-full ${
+                    cartLoading
+                      ? "bg-blue-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  } text-white py-4 rounded-md text-lg font-semibold shadow-lg transition`}
+                >
+                  {cartLoading ? "Buying..." : "Buy Now"}
+                </button>
+              </>
             ) : (
               <button
                 disabled

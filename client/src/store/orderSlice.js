@@ -1,91 +1,113 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../services/api";
 
-// 1. Place Order
-export const placeOrder = createAsyncThunk("order/place", async (orderData, thunkAPI) => {
-  try {
-    const res = await api.post("/orders", orderData);
-    return res.data;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data?.error || "Order creation failed");
+// Create Order
+export const createOrder = createAsyncThunk(
+  "orders/createOrder",
+  async (orderData, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post("/orders", orderData);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
   }
-});
+);
 
-// 2. Fetch My Orders
-export const fetchMyOrders = createAsyncThunk("order/fetchMy", async (_, thunkAPI) => {
-  try {
-    const res = await api.get("/orders");
-    return res.data;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data?.error || "Failed to load orders");
+// Get Logged-in User Orders
+export const fetchMyOrders = createAsyncThunk(
+  "orders/fetchMyOrders",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await api.get("/orders");
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.error || err.message);
+    }
   }
-});
+);
 
-// 3. Pay Order
-export const payOrder = createAsyncThunk("order/pay", async (orderId, thunkAPI) => {
-  try {
-    const res = await api.post(`/orders/${orderId}/pay`);
-    return res.data;
-  } catch (err) {
-    return thunkAPI.rejectWithValue(err.response?.data?.message || "Payment failed");
+// Pay Order (Test only)
+export const payOrder = createAsyncThunk(
+  "orders/payOrder",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post(`/orders/${orderId}/pay`);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
   }
-});
+);
+
+// Create Stripe Payment Intent
+export const createPaymentIntent = createAsyncThunk(
+  "orders/createPaymentIntent",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post(`/orders/create-payment-intent`, { orderId });
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Create Stripe Checkout Session
+export const createCheckoutSession = createAsyncThunk(
+  "orders/createCheckoutSession",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post(`/orders/create-checkout-session`, { orderId });
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
 
 const orderSlice = createSlice({
-  name: "order",
+  name: "orders",
   initialState: {
-    orders: [],
+    myOrders: [],
     currentOrder: null,
-    loading: false,
+    paymentClientSecret: null,
+    status: "idle",
     error: null,
-    success: null,
   },
   reducers: {
     clearOrderState: (state) => {
-      state.loading = false;
+      state.currentOrder = null;
+      state.paymentClientSecret = null;
       state.error = null;
-      state.success = null;
+      state.status = "idle";
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(placeOrder.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      // createOrder
+      .addCase(createOrder.pending, (state) => {
+        state.status = "loading";
       })
-      .addCase(placeOrder.fulfilled, (state, action) => {
-        state.loading = false;
-        state.success = "Order placed successfully";
+      .addCase(createOrder.fulfilled, (state, action) => {
+        state.status = "succeeded";
         state.currentOrder = action.payload;
       })
-      .addCase(placeOrder.rejected, (state, action) => {
-        state.loading = false;
+      .addCase(createOrder.rejected, (state, action) => {
+        state.status = "failed";
         state.error = action.payload;
       })
-
-      .addCase(fetchMyOrders.pending, (state) => {
-        state.loading = true;
-      })
+      // fetchMyOrders
       .addCase(fetchMyOrders.fulfilled, (state, action) => {
-        state.loading = false;
-        state.orders = action.payload;
+        state.myOrders = action.payload;
       })
-      .addCase(fetchMyOrders.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-
-      .addCase(payOrder.pending, (state) => {
-        state.loading = true;
-      })
+      // payOrder
       .addCase(payOrder.fulfilled, (state, action) => {
-        state.loading = false;
-        state.success = "Payment successful";
         state.currentOrder = action.payload.order;
       })
-      .addCase(payOrder.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      // createPaymentIntent
+      .addCase(createPaymentIntent.fulfilled, (state, action) => {
+        state.paymentClientSecret = action.payload.clientSecret;
       });
   },
 });

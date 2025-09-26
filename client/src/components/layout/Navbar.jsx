@@ -50,6 +50,12 @@ const Navbar = () => {
           >
             <User size={18} /> Profile
           </button>
+          <button
+            onClick={() => handleProtectedNavigate('/orders')}
+            className="flex items-center gap-1 hover:text-blue-600 bg-transparent border-0 cursor-pointer"
+          >
+            <User size={18} /> Orders
+          </button>
         </div>
       </div>
     </nav>
