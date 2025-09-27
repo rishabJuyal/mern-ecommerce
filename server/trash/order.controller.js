@@ -5,45 +5,10 @@ const Order = require("../../models/Order");
 const Product = require("../../models/Product");
 const sendEmail = require("../../utils/email");
 
-const updateOrderAndSendEmail = async (orderId, orderPlaceStatus, userEmail, isCOD) => {
-  try {
-    // Find the order by ID
-    const order = await Order.findById(orderId);
-    if (!order) {
-      throw new Error("Order not found");
-    }
-
-    // Update the orderPlaceStatus and payment status
-    order.orderPlaceStatus = orderPlaceStatus;
-    // Save the order
-    await order.save();
-
-    const paymentMessage = isCOD
-      ? "Your payment will be collected upon delivery (Cash on Delivery)."
-      : "Your payment has been received successfully.";
-
-    if (userEmail) {
-      await sendEmail(
-        userEmail,
-        "Order Placed Successfully",
-        `Your order with ID ${order._id} has been placed successfully. ${paymentMessage}`
-      );
-    }
-
-    return order; // Return the updated order
-  } catch (err) {
-    console.error("Error updating order and sending email:", err);
-    throw new Error("Error updating order and sending email");
-  }
-};
-
 exports.createOrder = async (req, res) => {
   try {
-    const { products, paymentMethod } = req.body;
+    const { products } = req.body;
 
-    if (!paymentMethod) {
-      return res.status(404).json({ message: "Payment Method is Missing" });
-    }
     // Calculate total amount
     let totalAmount = 0;
     for (const item of products) {
@@ -63,51 +28,29 @@ exports.createOrder = async (req, res) => {
         $inc: { stock: -item.quantity }
       });
     }
-    let order = new Order({
+    const order = new Order({
       user: req.user.id,
       products,
       totalAmount,
-      orderPlaceStatus: "Pending",
-      paymentMethod,
     });
 
     await order.save();
+    // inside placeOrder after saving the order
+    await sendEmail(
+      req.user.email,
+      "Order Placed Successfully",
+      `Your order with ID ${order._id} has been placed and is pending payment.`
+    );
 
-    res.status(201).json({ order });
+    res.status(201).json(order);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 };
-exports.placeOrder = async (req, res) => {
-  const { orderId } = req.body;
-  let order = await Order.findById(orderId);
-  if (!order) return res.status(404).json({ message: "Order not found" });
-
-  if (String(order.user) !== String(req.user.id)) {
-    return res.status(403).send("Unauthorized");
-  }
-
-  if (order.orderPlaceStatus == "Placed") {
-    return res.status(400).json({ message: "Already placed" });
-  }
-  const paymentMethod = order.paymentMethod;
-  // If it's COD, immediately send email and return the order
-  if (paymentMethod === "COD") {
-    order = await updateOrderAndSendEmail(order._id, "Placed", req.user.email, true);  // isCOD = true
-    return res.status(201).json(order);  // Order is now placed, and email sent
-  }
-
-  if (paymentMethod === "ONLINE") {
-    const checkoutUrl = await createCheckoutSession(orderId);
-    return res.json({ url: checkoutUrl });
-  }
-
-  return res.status(400).json({ message: "Invalid payment method" });
-};
 
 exports.getOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ user: req.user.id, orderPlaceStatus: 'Placed' }).populate("products.productId");
+    const orders = await Order.find({ user: req.user.id }).populate("products.productId");
     res.json(orders);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -137,14 +80,83 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-//To pay using stripe ui
-const createCheckoutSession = async (orderId) => {
+//only for test purpose
+exports.payOrder = async (req, res) => {
   try {
+    const orderId = req.params.id;
+    const userId = req.user.id;
+
+    const order = await Order.findOne({ _id: orderId, user: userId });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order Not Found" });
+    }
+    if (order.paymentStatus === "Paid") {
+      return res.status(400).json({ message: "Order is already paid" });
+    }
+    if (order.paymentStatus !== "Pending") {
+      return res.status(400).json({ message: "Order cannot be paid" });
+    }    
+
+    // Simulate payment success
+    order.paymentStatus = "Paid";
+    await order.save();
+    // inside payOrder after saving the order
+    await sendEmail(
+      req.user.email,
+      "Order Payment Successful",
+      `Your order with ID ${order._id} has been successfully paid. Thank you for shopping with us!`
+    );
+
+
+    res.json({ message: "Payment successful", order });
+
+  } catch (err) {
+    console.error("pay order", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//to pay using our frontend 
+exports.createPaymentIntent = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
     const order = await Order.findById(orderId);
-    if (!order) throw new Error("Order not found");
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
     // ✅ Prevent re-payment
-    if (order.paymentStatus === "Paid") throw new Error("Order already paid");
+    if (order.paymentStatus === "Paid") {
+      return res.status(400).json({ message: "Order already paid" });
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(order.totalAmount * 100), // amount in cents
+      currency: "usd",
+      metadata: { orderId: order._id.toString() }
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret
+    });
+  } catch (error) {
+    console.error("Payment Intent Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+//To pay using stripe ui
+exports.createCheckoutSession = async (req, res) => {
+  try {
+    const { orderId } = req.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    // ✅ Prevent re-payment
+    if (order.paymentStatus === "Paid") {
+      return res.status(400).json({ message: "Order already paid" });
+    }
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -152,7 +164,7 @@ const createCheckoutSession = async (orderId) => {
       line_items: [
         {
           price_data: {
-            currency: 'inr',
+            currency: 'usd',
             product_data: {
               name: `Order #${order._id}`,
             },
@@ -164,14 +176,14 @@ const createCheckoutSession = async (orderId) => {
       metadata: {
         orderId: order._id.toString(),
       },
-      success_url: 'http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'http://localhost:5173/payment-cancel',
+      success_url: 'http://localhost:5000/payment-success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'http://localhost:5000/payment-cancel',
     });
 
-    return session.url; // return the URL to caller
+    res.json({ url: session.url }); // send back the hosted Stripe Checkout URL
   } catch (error) {
-    console.error("❌ Error creating Stripe Checkout session:", error.message);
-    throw error;
+    console.error("Checkout Session Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -196,13 +208,11 @@ exports.stripeWebhook = async (req, res) => {
       const session = event.data.object;
       const orderId = session.metadata.orderId;
 
-      const order = await Order.findById(orderId).populate('user', 'name username email role');
+      const order = await Order.findById(orderId);
       if (order) {
         if (order.paymentStatus !== "Paid") {
           order.paymentStatus = "Paid";
           await order.save();
-          const userEmail = order.user.email;
-          await updateOrderAndSendEmail(order._id, "Placed", userEmail, false);  // isCOD = false
           console.log(`✅ Order ${order._id} marked as paid via webhook`);
         } else {
           console.log(`⚠️ Order ${order._id} already marked as paid. Skipping.`);
@@ -253,21 +263,20 @@ exports.paymentSuccess = async (req, res) => {
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     const orderId = session.metadata.orderId;
-    let order = await Order.findById(orderId);
+    const order = await Order.findById(orderId);
 
     if (!order) return res.status(404).send("Order not found");
-
+    
     if (String(order.user) !== String(req.user.id)) {
       return res.status(403).send("Unauthorized");
     }
-
+    
     if (session.payment_status === "paid" && order.paymentStatus !== "Paid") {
       order.paymentStatus = "Paid";
       await order.save();
-      order = await updateOrderAndSendEmail(order._id, "Placed", null, false);  // isCOD = false
     }
 
-    res.json({ order });
+    res.render('payment-success', { order });
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");

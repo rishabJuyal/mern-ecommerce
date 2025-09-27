@@ -26,6 +26,7 @@ const AppRoutes = () => {
       <Route path="/products/:id" element={<ProductPage />} />
 
       <Route path="/add-product" element={<AddProduct />} />
+      <Route path="/payment-success" element={<PaymentSuccess />} />
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>

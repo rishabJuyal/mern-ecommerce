@@ -1,20 +1,39 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../services/api";
 
-// Create Order
+// ---------------------------------------------
+// 🔄 CREATE ORDER (Step 1)
+// ---------------------------------------------
 export const createOrder = createAsyncThunk(
   "orders/createOrder",
   async (orderData, { rejectWithValue }) => {
     try {
-      const { data } = await api.post("/orders", orderData);
-      return data;
+      const { data } = await api.post("/orders", orderData); // POST /orders
+      return data.order; // Only returning the `order`
     } catch (err) {
       return rejectWithValue(err.response?.data?.error || err.message);
     }
   }
 );
 
-// Get Logged-in User Orders
+// ---------------------------------------------
+// ✅ PLACE ORDER (Step 2: finalize - COD / Stripe)
+// ---------------------------------------------
+export const placeOrder = createAsyncThunk(
+  "orders/placeOrder",
+  async ({ orderId }, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post("/orders/place-order", { orderId });
+      return data; // Can be order (COD) or { url } (Stripe)
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// ---------------------------------------------
+// 👤 GET LOGGED-IN USER ORDERS
+// ---------------------------------------------
 export const fetchMyOrders = createAsyncThunk(
   "orders/fetchMyOrders",
   async (_, { rejectWithValue }) => {
@@ -27,33 +46,9 @@ export const fetchMyOrders = createAsyncThunk(
   }
 );
 
-// Pay Order (Test only)
-export const payOrder = createAsyncThunk(
-  "orders/payOrder",
-  async (orderId, { rejectWithValue }) => {
-    try {
-      const { data } = await api.post(`/orders/${orderId}/pay`);
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
-    }
-  }
-);
-
-// Create Stripe Payment Intent
-export const createPaymentIntent = createAsyncThunk(
-  "orders/createPaymentIntent",
-  async (orderId, { rejectWithValue }) => {
-    try {
-      const { data } = await api.post(`/orders/create-payment-intent`, { orderId });
-      return data;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
-    }
-  }
-);
-
-// Create Stripe Checkout Session
+// ---------------------------------------------
+// 💳 Create Stripe Checkout Session (optional)
+// ---------------------------------------------
 export const createCheckoutSession = createAsyncThunk(
   "orders/createCheckoutSession",
   async (orderId, { rejectWithValue }) => {
@@ -66,6 +61,24 @@ export const createCheckoutSession = createAsyncThunk(
   }
 );
 
+// ---------------------------------------------
+// 🧾 PAY ORDER (for testing/manual use)
+// ---------------------------------------------
+export const payOrder = createAsyncThunk(
+  "orders/payOrder",
+  async (orderId, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post(`/orders/${orderId}/pay`);
+      return data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// ---------------------------------------------
+// 🧠 SLICE
+// ---------------------------------------------
 const orderSlice = createSlice({
   name: "orders",
   initialState: {
@@ -85,9 +98,12 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // createOrder
+      // ---------------------------------------------
+      // CREATE ORDER
+      // ---------------------------------------------
       .addCase(createOrder.pending, (state) => {
         state.status = "loading";
+        state.error = null;
       })
       .addCase(createOrder.fulfilled, (state, action) => {
         state.status = "succeeded";
@@ -97,17 +113,50 @@ const orderSlice = createSlice({
         state.status = "failed";
         state.error = action.payload;
       })
-      // fetchMyOrders
+
+      // ---------------------------------------------
+      // PLACE ORDER (COD or Stripe)
+      // ---------------------------------------------
+      .addCase(placeOrder.pending, (state) => {
+        state.status = "loading";
+        state.error = null;
+      })
+      .addCase(placeOrder.fulfilled, (state, action) => {
+        state.status = "succeeded";
+
+        // If response has `url`, it's a Stripe payment
+        if (action.payload?.url) {
+          // We don’t set currentOrder here because Stripe redirects
+          // and the success page will fetch again
+        } else {
+          // COD - update currentOrder state
+          state.currentOrder = action.payload;
+        }
+      })
+      .addCase(placeOrder.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload;
+      })
+
+      // ---------------------------------------------
+      // FETCH USER ORDERS
+      // ---------------------------------------------
       .addCase(fetchMyOrders.fulfilled, (state, action) => {
         state.myOrders = action.payload;
       })
-      // payOrder
+
+      // ---------------------------------------------
+      // PAY ORDER
+      // ---------------------------------------------
       .addCase(payOrder.fulfilled, (state, action) => {
         state.currentOrder = action.payload.order;
       })
-      // createPaymentIntent
-      .addCase(createPaymentIntent.fulfilled, (state, action) => {
-        state.paymentClientSecret = action.payload.clientSecret;
+
+      // ---------------------------------------------
+      // STRIPE CHECKOUT SESSION (optional)
+      // ---------------------------------------------
+      .addCase(createCheckoutSession.fulfilled, (state, action) => {
+        // Handled in frontend after redirect
       });
   },
 });

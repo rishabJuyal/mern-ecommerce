@@ -5,12 +5,13 @@ const {authMiddleware ,authorizeRoles} = require("../../middlewares/auth.middlew
 
 // Create order
 router.post("/", authMiddleware, orderController.createOrder);
-router.post("/place-order", authMiddleware, orderController.placeOrder);
 
 // Get orders for the logged-in user
 router.get("/", authMiddleware, orderController.getOrders);
+router.post("/:id/pay",authMiddleware,orderController.payOrder)
+router.post("/create-payment-intent", authMiddleware, orderController.createPaymentIntent);// to pay in our frontend
+router.post("/create-checkout-session", authMiddleware, orderController.createCheckoutSession);//to open stripe ui
 router.get('/payment-success', authMiddleware, orderController.paymentSuccess);
-// router.post("/create-checkout-session", authMiddleware, orderController.createCheckoutSession);//to open stripe ui
 
 // Admin routes (optional: protect with admin check)
 router.get("/all", authMiddleware,authorizeRoles('admin'), orderController.getAllOrders);

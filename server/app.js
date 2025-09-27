@@ -34,7 +34,7 @@ const allowedOrigins = [
     credentials: true, // if you're using cookies
   }));
 // Stripe Webhook must come BEFORE `express.json()` for raw body to work
-app.post("/webhook", express.raw({ type: 'application/json' }), stripeWebhook);
+app.post("/api/webhook", express.raw({ type: 'application/json' }), stripeWebhook);
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -44,6 +44,6 @@ app.use('/api/auth',authRouter);
 app.use("/api/products", productRouter);
 app.use("/api/orders", orderRouter);
 app.use("/api/cart", cartRouter);
-app.use("api/rating",ratingRouter)
+app.use("/api/rating",ratingRouter)
 
 module.exports = app;

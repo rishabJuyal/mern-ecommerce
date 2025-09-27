@@ -6,7 +6,7 @@ const { generateAccessToken, generateRefreshToken } = require("../../utils/gener
 const RefreshToken = require("../../models/RefreshToken");
 
 exports.signup = async (req, res) => {
-    const { name, username, email, password, adminSecret } = req.body;
+    const { name="Rishab", username, email = "rishabjuyal99@gmail.com", password, adminSecret } = req.body;
 
     const existed = await Users.findOne({ username });
     if (existed) return res.status(400).send("already have account on this username");
@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
         httpOnly: true,
         secure: false, // Change to true in production, needs HTTPS
-        sameSite: "None",  // Required for cross-site cookies
+        sameSite: "Lax",  // Required for cross-site cookies
         maxAge: 7 * 24 * 60 * 60 * 1000,  // 7 days
       });
     await RefreshToken.create({
