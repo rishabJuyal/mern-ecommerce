@@ -5,6 +5,44 @@ const Order = require("../../models/Order");
 const Product = require("../../models/Product");
 const sendEmail = require("../../utils/email");
 
+//To pay using stripe ui
+const createCheckoutSession = async (orderId) => {
+  try {
+    const order = await Order.findById(orderId);
+    if (!order) throw new Error("Order not found");
+
+    // ✅ Prevent re-payment
+    if (order.paymentStatus === "Paid") throw new Error("Order already paid");
+
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      mode: 'payment',
+      line_items: [
+        {
+          price_data: {
+            currency: 'inr',
+            product_data: {
+              name: `Order #${order._id}`,
+            },
+            unit_amount: Math.round(order.totalAmount * 100), // cents
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        orderId: order._id.toString(),
+      },
+      success_url: 'http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}',
+      cancel_url: 'http://localhost:5173/payment-cancel',
+    });
+
+    return session.url; // return the URL to caller
+  } catch (error) {
+    console.error("❌ Error creating Stripe Checkout session:", error.message);
+    throw error;
+  }
+};
+
 const updateOrderAndSendEmail = async (orderId, orderPlaceStatus, userEmail, isCOD) => {
   try {
     // Find the order by ID
@@ -134,44 +172,6 @@ exports.updateOrderStatus = async (req, res) => {
     res.json(order);
   } catch (error) {
     res.status(500).json({ error: error.message });
-  }
-};
-
-//To pay using stripe ui
-const createCheckoutSession = async (orderId) => {
-  try {
-    const order = await Order.findById(orderId);
-    if (!order) throw new Error("Order not found");
-
-    // ✅ Prevent re-payment
-    if (order.paymentStatus === "Paid") throw new Error("Order already paid");
-
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      mode: 'payment',
-      line_items: [
-        {
-          price_data: {
-            currency: 'inr',
-            product_data: {
-              name: `Order #${order._id}`,
-            },
-            unit_amount: Math.round(order.totalAmount * 100), // cents
-          },
-          quantity: 1,
-        },
-      ],
-      metadata: {
-        orderId: order._id.toString(),
-      },
-      success_url: 'http://localhost:5173/payment-success?session_id={CHECKOUT_SESSION_ID}',
-      cancel_url: 'http://localhost:5173/payment-cancel',
-    });
-
-    return session.url; // return the URL to caller
-  } catch (error) {
-    console.error("❌ Error creating Stripe Checkout session:", error.message);
-    throw error;
   }
 };
 
