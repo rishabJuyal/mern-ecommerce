@@ -15,11 +15,20 @@ const upload = multer({
 exports.createProduct = [
   upload.array("images", 5), // Accept up to 5 images
   async (req, res) => {
+    const { name, description, price, category, stock, codAvailable } = req.body
+
+    // Basic Validation
+    if (!name || !description || !price || !category) {
+      return res.status(400).json({ error: "Missing required fields." });
+    }
+
     try {
       if (!req.files || req.files.length === 0) {
         return res.status(400).json({ error: "No images uploaded." });
       }
-
+      if (isNaN(price) || price <= 0) {
+        return res.status(400).json({ error: "Invalid price." });
+      }
       // Upload images to Cloudinary
       const uploadPromises = req.files.map((file) =>
         cloudinary.uploader.upload(file.path, {
@@ -35,7 +44,12 @@ exports.createProduct = [
 
       // Create and save product
       const product = new Product({
-        ...req.body,
+        name,
+        description,
+        price,
+        category,
+        stock,
+        codAvailable,
         images: imageUrls,
       });
 

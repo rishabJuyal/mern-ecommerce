@@ -11,6 +11,8 @@ const productSchema = new mongoose.Schema({
   images: [String],
   averageRating: { type: Number, default: 0 },
   numReviews: { type: Number, default: 0 },
+  // availablePaymentMethods: { type: String, enum:["ALL","ONLINE","COD"],default:"ALL"},
+  codAvailable: {type: Boolean, default: true},
 }, {
   timestamps: true,
 });

@@ -77,6 +77,25 @@ const Checkout = () => {
     };
   }, [dispatch, productId, quantity]);
 
+  const getAvailablePaymentMethods = () => {
+    const items = singleProduct ? [singleProduct] : cartItems;
+    const allCODAvailable = items.every((item) => item.product.codAvailable);
+    return {
+      COD: allCODAvailable,
+      ONLINE: true,
+    };
+  };
+
+  const paymentAvailability = getAvailablePaymentMethods();
+
+  // Auto-correct invalid payment method
+  useEffect(() => {
+    if (!paymentAvailability[paymentMethod]) {
+      const fallback = paymentAvailability.COD ? "COD" : "ONLINE";
+      setPaymentMethod(fallback);
+    }
+  }, [paymentAvailability, paymentMethod]);
+
   const getTotal = () => {
     return (singleProduct ? [singleProduct] : cartItems).reduce(
       (acc, item) => acc + item.product.price * item.quantity,
@@ -115,10 +134,8 @@ const Checkout = () => {
       const res = await dispatch(placeOrder({ orderId: currentOrder._id })).unwrap();
 
       if (res?.url) {
-        // ONLINE payment → Redirect to Stripe
         window.location.href = res.url;
       } else {
-        // COD or payment done → navigate to shop
         alert("Order placed successfully.");
         navigate("/shop");
       }
@@ -148,29 +165,41 @@ const Checkout = () => {
                 getTotal={getTotal}
               />
 
-              {/* Payment Method Selection */}
               {!currentOrder && (
                 <div className="mt-6">
                   <label className="block font-medium mb-2">
                     Select Payment Method:
                   </label>
                   <div className="space-y-2">
-                    <label className="flex items-center">
+                    {/* COD Option */}
+                    <label
+                      className={`flex items-center ${
+                        !paymentAvailability.COD ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="COD"
+                        disabled={!paymentAvailability.COD}
                         checked={paymentMethod === "COD"}
                         onChange={() => setPaymentMethod("COD")}
                         className="mr-2"
                       />
                       Cash on Delivery (COD)
                     </label>
-                    <label className="flex items-center">
+
+                    {/* ONLINE Option */}
+                    <label
+                      className={`flex items-center ${
+                        !paymentAvailability.ONLINE ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
+                    >
                       <input
                         type="radio"
                         name="paymentMethod"
                         value="ONLINE"
+                        disabled={!paymentAvailability.ONLINE}
                         checked={paymentMethod === "ONLINE"}
                         onChange={() => setPaymentMethod("ONLINE")}
                         className="mr-2"
@@ -181,7 +210,6 @@ const Checkout = () => {
                 </div>
               )}
 
-              {/* Action Buttons */}
               {!currentOrder ? (
                 <button
                   onClick={handleCreateOrder}

@@ -21,6 +21,7 @@ const AddProduct = () => {
     price: "",
     category: "",
     stock: "",
+    codAvailable: true, // default value
   });
   const [imageFiles, setImageFiles] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
@@ -212,6 +213,30 @@ const AddProduct = () => {
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+          </div>
+          {/* COD Available Toggle */}
+          <div className="mb-4">
+            <label htmlFor="codAvailable" className="block text-gray-700 font-medium">
+              Cash on Delivery Available
+            </label>
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                id="codAvailable"
+                name="codAvailable"
+                checked={formData.codAvailable}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    codAvailable: e.target.checked,
+                  }))
+                }
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="codAvailable" className="ml-2 text-gray-700">
+                Enable COD for this product
+              </label>
+            </div>
           </div>
 
           {/* Image Upload */}
