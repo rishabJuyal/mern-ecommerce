@@ -92,6 +92,9 @@ exports.createOrder = async (req, res) => {
       if (product.stock < item.quantity) {
         return res.status(400).json({ error: `Not enough stock for ${product.name}` });
       }
+      if (!product.codAvailable && paymentMethod === "COD") {
+        return res.status(400).json({ error: `Not COD available for ${product.name}` });
+      }
       totalAmount += product.price * item.quantity;
     }
 

@@ -25,7 +25,7 @@ exports.update = async (req, res) => {
         const updated = await Users.findOneAndUpdate(
             { username: req.params.username },
             updateFields,
-            { new: true }
+            { new: true } //return latest changed data
         );
 
         if (!updated) {

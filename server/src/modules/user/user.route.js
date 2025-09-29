@@ -6,7 +6,7 @@ const { getAll, update, remove } = require("./user.controller");
 
 
 router.get('/', authMiddleware,getAll);
-router.put('/:username', authMiddleware,update);
+router.post('/update', authMiddleware,update);
 router.delete('/:name', authMiddleware,remove);
 
 module.exports = router;
