@@ -31,6 +31,15 @@ const orderSchema = new mongoose.Schema({
   ],
   paymentMethod: { type: String, enum: ["ONLINE", "COD"], default: "ONLINE" },
   orderPlaceStatus : {type: String, enum: ["Pending", "Placed"], default: "Pending" },
+  address: {
+    fullName: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+    streetAddress: { type: String, required: true },
+    city: { type: String, required: true },
+    state: { type: String },
+    postalCode: { type: String, required: true },
+    country: { type: String, required: true },
+  },
 }, { timestamps: true });
 
 // Middleware to add initial status history entry when saving

@@ -24,7 +24,7 @@ export const login = createAsyncThunk(
         try {
             const res = await api.post("/auth/login", { username, password });
             console.log("login response:", res.data);
-            return res.data.jwt;
+            return res.data;
         } catch (err) {
             console.log("login error:", err.response || err);
             return thunkAPI.rejectWithValue(err.response?.data || "Login failed");
@@ -36,7 +36,7 @@ export const login = createAsyncThunk(
 export const refreshToken = createAsyncThunk("auth/refresh", async (_, thunkAPI) => {
     try {
         const res = await api.post("/auth/refresh");
-        return res.data.accessToken;
+        return res.data;
     } catch (err) {
         return thunkAPI.rejectWithValue(err.response?.data || "Refresh failed");
     }
@@ -54,6 +54,7 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
 const authSlice = createSlice({
     name: "auth",
     initialState: {
+        user: null,
         accessToken: null,
         loading: false,
         error: null,
@@ -73,7 +74,8 @@ const authSlice = createSlice({
             })
             .addCase(login.fulfilled, (state, action) => {
                 state.loading = false;
-                state.accessToken = action.payload;
+                state.accessToken = action.payload.jwt;
+                state.user = action.payload.user;
             })
             .addCase(login.rejected, (state, action) => {
                 state.loading = false;
@@ -96,7 +98,8 @@ const authSlice = createSlice({
 
             // refresh
             .addCase(refreshToken.fulfilled, (state, action) => {
-                state.accessToken = action.payload;
+                state.accessToken = action.payload.accessToken;
+                state.user = action.payload.user;
             })
             .addCase(refreshToken.rejected, (state) => {
                 state.accessToken = null;
@@ -105,6 +108,7 @@ const authSlice = createSlice({
             // logout
             .addCase(logout.fulfilled, (state) => {
                 state.accessToken = null;
+                state.user = null;
             });
     },
 });

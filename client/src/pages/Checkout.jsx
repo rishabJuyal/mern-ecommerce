@@ -7,7 +7,8 @@ import {
 } from "../store/orderSlice";
 import { fetchCart } from "../store/cartSlice";
 import { fetchProductById } from "../store/productSlice";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
+import AddressCard from "../components/ecommerce/AddressCard";
 
 const LoadingState = () => <p className="text-gray-600">Processing...</p>;
 
@@ -53,6 +54,9 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("COD");
   const [loadingAction, setLoadingAction] = useState(false);
 
+  const user = useSelector((state) => state.auth.user);
+  const defaultAddress = user.address.find(a => a.isDefault);
+console.log("default",defaultAddress)
   useEffect(() => {
     if (productId && quantity) {
       setLoadingProduct(true);
@@ -112,13 +116,13 @@ const Checkout = () => {
     const products = singleProduct
       ? [{ productId: singleProduct.product._id, quantity: singleProduct.quantity }]
       : cartItems.map((item) => ({
-          productId: item.product._id,
-          quantity: item.quantity,
-        }));
+        productId: item.product._id,
+        quantity: item.quantity,
+      }));
 
     setLoadingAction(true);
     try {
-      await dispatch(createOrder({ products, paymentMethod })).unwrap();
+      await dispatch(createOrder({ products, paymentMethod, address: defaultAddress })).unwrap();
     } catch (err) {
       alert("Failed to create order.");
     } finally {
@@ -160,6 +164,15 @@ const Checkout = () => {
             <p className="text-gray-500">Your cart is empty.</p>
           ) : (
             <>
+              {/* Address Section */}
+              <div className="mt-6">
+                <h2 className="text-lg font-semibold mb-2">Shipping Address</h2>
+                <AddressCard
+                  address={defaultAddress}
+                  onChangeClick={() => navigate("/change-address")}
+                />
+              </div>
+
               <OrderSummary
                 cartItems={singleProduct ? [singleProduct] : cartItems}
                 getTotal={getTotal}
@@ -173,9 +186,8 @@ const Checkout = () => {
                   <div className="space-y-2">
                     {/* COD Option */}
                     <label
-                      className={`flex items-center ${
-                        !paymentAvailability.COD ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      className={`flex items-center ${!paymentAvailability.COD ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     >
                       <input
                         type="radio"
@@ -191,9 +203,8 @@ const Checkout = () => {
 
                     {/* ONLINE Option */}
                     <label
-                      className={`flex items-center ${
-                        !paymentAvailability.ONLINE ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                      className={`flex items-center ${!paymentAvailability.ONLINE ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                     >
                       <input
                         type="radio"

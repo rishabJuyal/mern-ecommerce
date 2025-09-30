@@ -77,7 +77,11 @@ const updateOrderAndSendEmail = async (orderId, orderPlaceStatus, userEmail, isC
 
 exports.createOrder = async (req, res) => {
   try {
-    const { products, paymentMethod } = req.body;
+    const { products, paymentMethod, address} = req.body;
+
+    if(!address){
+      return res.status(404).json({ message: "Address is Missing" });
+    }
 
     if (!paymentMethod) {
       return res.status(404).json({ message: "Payment Method is Missing" });
@@ -110,6 +114,7 @@ exports.createOrder = async (req, res) => {
       totalAmount,
       orderPlaceStatus: "Pending",
       paymentMethod,
+      address
     });
 
     await order.save();

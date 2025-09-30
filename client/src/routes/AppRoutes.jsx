@@ -14,6 +14,7 @@ import RegisterPage from "../pages/Register";
 import ProductPage from "../features/products/ProductPage";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import Checkout from "../pages/Checkout";
+import AddressPage from "../features/address/AddressPage";
 
 const AppRoutes = () => {
   return (
@@ -26,6 +27,8 @@ const AppRoutes = () => {
       <Route path="/products/:id" element={<ProductPage />} />
 
       <Route path="/add-product" element={<AddProduct />} />
+      <Route path="/change-address" element={<AddressPage />} />
+
       <Route path="/payment-success" element={<PaymentSuccess />} />
 
       {/* Protected Routes */}

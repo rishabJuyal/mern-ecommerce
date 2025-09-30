@@ -4,6 +4,8 @@ const bcrypt = require("bcrypt");
 const Users = require("../../models/User");
 const { generateAccessToken, generateRefreshToken } = require("../../utils/generateTokens");
 const RefreshToken = require("../../models/RefreshToken");
+const { find } = require("../../models/Order");
+const User = require("../../models/User");
 
 exports.signup = async (req, res) => {
     const { name = "Rishab", username, email = "rishabjuyal99@gmail.com", password, adminSecret } = req.body;
@@ -66,10 +68,10 @@ exports.login = async (req, res) => {
         userAgent,
         expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     })
-
+    const { password: _, ...userWithoutPassword } = user.toObject();
     res.json({
         jwt: accessToken,
-        role: user.role,
+        user: userWithoutPassword,
     })
 }
 
@@ -88,7 +90,13 @@ exports.refresh = async (req, res) => {
     try {
         const decoded = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
         const newAccessToken = generateAccessToken(decoded);
-        res.json({ accessToken: newAccessToken });
+
+        const user = await User.findById(decoded.id).select("-password -createdAt -updatedAt -__v");
+        res.json(
+            { 
+                accessToken: newAccessToken,
+                user 
+            });
     } catch (err) {
         console.log(err);
         res.status(403).send("Invalid refresh token");

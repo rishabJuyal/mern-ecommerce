@@ -9,7 +9,7 @@ const addressSchema = new mongoose.Schema({
   postalCode: { type: String, required: true },
   country: { type: String, required: true },
   isDefault: { type: Boolean, default: false }
-}, { _id: false }); // prevents automatic _id for each address
+}, { _id: true }); // prevents automatic _id for each address
 
 
   const userSchema = new mongoose.Schema({
