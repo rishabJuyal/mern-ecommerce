@@ -134,3 +134,48 @@ exports.deleteProduct = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// Search products by name or description
+// Controller: product.controller.js
+
+// Search products by name or description with fuzzy matching
+exports.searchProducts = async (req, res) => {
+  const { query, limit = 10 } = req.query; // Get search term and optional limit
+
+  if (!query) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
+
+  try {
+    // Perform a full-text search using MongoDB's $text operator
+    const products = await Product.find({
+      $text: { $search: query }  // Use $text to search for multiple words
+    }).limit(Number(limit));
+
+    res.json(products);
+  } catch (error) {
+    console.error("Search error:", error);
+    res.status(500).json({ error: "Failed to search products" });
+  }
+};
+
+
+// Fetch search suggestions based on a query prefix (fuzzy matching)
+exports.getSearchSuggestions = async (req, res) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.status(400).json({ error: "Query parameter is required" });
+  }
+
+  try {
+    const suggestions = await Product.find({
+      name: { $regex: query, $options: 'i' } // Match anywhere in name
+    }).limit(5).distinct('name');
+
+    res.json(suggestions);
+  } catch (error) {
+    console.error("Suggestion error:", error);
+    res.status(500).json({ error: "Failed to fetch search suggestions" });
+  }
+};

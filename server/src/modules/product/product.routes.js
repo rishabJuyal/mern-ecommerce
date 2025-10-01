@@ -5,13 +5,14 @@ const {authMiddleware, authorizeRoles} = require("../../middlewares/auth.middlew
 
 // router.use(authMiddleware);//common middle ware 
 
-//user APIs
 router.get("/", productController.getAllProducts);
+router.get("/search", productController.searchProducts);
+router.get("/suggestions", productController.getSearchSuggestions);
 router.get("/:id", productController.getProduct);
 
-//admin APIs
-router.post("/",authMiddleware,authorizeRoles('admin'), productController.createProduct);
-router.put("/:id",authMiddleware,authorizeRoles('admin'), productController.updateProduct);
-router.delete("/:id",authMiddleware,authorizeRoles('admin'), productController.deleteProduct);
+router.post("/", authMiddleware, authorizeRoles('admin'), productController.createProduct);
+router.put("/:id", authMiddleware, authorizeRoles('admin'), productController.updateProduct);
+router.delete("/:id", authMiddleware, authorizeRoles('admin'), productController.deleteProduct);
+
 
 module.exports = router;
