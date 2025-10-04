@@ -4,11 +4,11 @@ import {
   createOrder,
   clearOrderState,
   placeOrder
-} from "../store/orderSlice";
-import { fetchCart } from "../store/cartSlice";
-import { fetchProductById } from "../store/productSlice";
+} from "../../store/orderSlice";
+import { fetchCart } from "../../store/cartSlice";
+import { fetchProductById } from "../../store/productSlice";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
-import AddressCard from "../components/ecommerce/AddressCard";
+import AddressCard from "../../components/ecommerce/AddressCard";
 
 const LoadingState = () => <p className="text-gray-600">Processing...</p>;
 

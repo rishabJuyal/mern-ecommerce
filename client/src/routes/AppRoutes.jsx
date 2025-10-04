@@ -13,7 +13,7 @@ import AddProduct from "../pages/admin/AddProduct";
 import RegisterPage from "../pages/Register";
 import ProductPage from "../features/products/ProductPage";
 import PaymentSuccess from "../pages/PaymentSuccess";
-import Checkout from "../pages/Checkout";
+import Checkout from "../features/checkout/Checkout";
 import AddressPage from "../features/address/AddressPage";
 
 const AppRoutes = () => {
