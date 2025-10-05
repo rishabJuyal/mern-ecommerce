@@ -68,14 +68,15 @@ const Carousel = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto rounded-md overflow-hidden shadow-lg">
+    <div className="w-full max-w-7xl mx-auto overflow-hidden">
       <Slider {...settings}>
         {carouselItems.map((item, idx) => (
           <div key={idx} className="flex justify-center">
             <img
               src={item.image}
               alt={item.alt}
-              className="w-full max-h-[500px] object-cover rounded-md block"
+              className="w-full h-full object-cover block"
+              style={{ objectPosition: 'center center' }} // Ensures the image stays centered
             />
           </div>
         ))}

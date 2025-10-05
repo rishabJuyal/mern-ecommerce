@@ -14,9 +14,9 @@ const brands = [
 
 const BrandsStrip = () => {
   return (
-    <div className="bg-white py-10 border-t">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-6 items-center justify-items-center">
+    <div className="bg-white py-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-16 items-center justify-items-center">
           {brands.map((brand, idx) => (
             <a
               key={idx}
