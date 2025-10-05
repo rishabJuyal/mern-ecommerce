@@ -7,7 +7,6 @@ import SearchComponent from "../components/ecommerce/SearchComponent";
 const Shop = () => {
   return (
     <div className="bg-gray-50 min-h-screen">
-      <SearchComponent />
       <ProductsList />
     </div>
   );

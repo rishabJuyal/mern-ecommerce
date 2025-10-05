@@ -15,6 +15,7 @@ import ProductPage from "../features/products/ProductPage";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import Checkout from "../features/checkout/Checkout";
 import AddressPage from "../features/address/AddressPage";
+import SearchResults from "../components/ecommerce/SearchResults";
 
 const AppRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
       <Route path="/shop" element={<Shop />} />
+      <Route path="/search" element={<SearchResults />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/products/:id" element={<ProductPage />} />

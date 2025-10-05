@@ -136,9 +136,6 @@ exports.deleteProduct = async (req, res) => {
 };
 
 // Search products by name or description
-// Controller: product.controller.js
-
-// Search products by name or description with fuzzy matching
 exports.searchProducts = async (req, res) => {
   const { query, limit = 10 } = req.query; // Get search term and optional limit
 
@@ -147,10 +144,13 @@ exports.searchProducts = async (req, res) => {
   }
 
   try {
-    // Perform a full-text search using MongoDB's $text operator
+    // Full-text search based on name or description
     const products = await Product.find({
-      $text: { $search: query }  // Use $text to search for multiple words
-    }).limit(Number(limit));
+      $or: [
+        { name: { $regex: query, $options: 'i' } },  // Case insensitive search
+        { description: { $regex: query, $options: 'i' } }
+      ]
+    }).limit(Number(limit));  // Optional limit to control result size
 
     res.json(products);
   } catch (error) {
@@ -158,7 +158,6 @@ exports.searchProducts = async (req, res) => {
     res.status(500).json({ error: "Failed to search products" });
   }
 };
-
 
 // Fetch search suggestions based on a query prefix (fuzzy matching)
 exports.getSearchSuggestions = async (req, res) => {

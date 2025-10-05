@@ -1,6 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   ShoppingCart,
   Heart,
@@ -8,10 +8,18 @@ import {
   User,
 } from "lucide-react";
 import { FaFlagUsa } from "react-icons/fa";
+import SearchBar from "../ecommerce/SearchComponent";
+import { fetchCart } from "../../store/cartSlice";
 
 const Navbar = () => {
   const { accessToken } = useSelector((state) => state.auth);
+  const { items } = useSelector((state) => state.cart);
   const navigate = useNavigate();
+
+  const  dispatch = useDispatch();
+  useEffect(()=>{
+    dispatch(fetchCart());
+  },[])
 
   const handleProtectedNavigate = (path) => {
     if (!accessToken) {
@@ -33,21 +41,7 @@ const Navbar = () => {
 
         {/* Search Bar */}
         <div className="flex-grow mx-8 max-w-3xl">
-          <div className="flex border border-gray-300 bg-white rounded overflow-hidden">
-            <select className="bg-transparent text-sm px-3 py-2 border-r outline-none">
-              <option value="all">All</option>
-              <option value="electronics">Electronics</option>
-              <option value="fashion">Fashion</option>
-            </select>
-            <input
-              type="text"
-              placeholder="I'm shopping for..."
-              className="flex-grow px-4 py-2 outline-none text-sm"
-            />
-            <button className="bg-black text-white px-6 font-semibold text-sm hover:bg-gray-800">
-              Search
-            </button>
-          </div>
+          <SearchBar />
         </div>
 
         {/* Icons */}
@@ -78,7 +72,7 @@ const Navbar = () => {
           >
             <ShoppingCart size={20} />
             <span className="absolute -top-2 -right-2 bg-black text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-              0
+              {items.length}
             </span>
           </div>
 
