@@ -35,8 +35,8 @@ const Navbar = () => {
       <div className="bg-yellow-400 px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-black">
-          <span className="text-black">mart</span>
-          <span className="text-white">fury</span>
+          <span className="text-black">J</span>
+          <span className="text-white">shop</span>
         </Link>
 
         {/* Search Bar */}
@@ -112,9 +112,9 @@ const Navbar = () => {
 
         <div className="flex items-center gap-4 text-black">
           <Link to="/sell" className="hover:underline">
-            Sell on Martfury
+            Sell on Jshop
           </Link>
-          <Link to="/track-order" className="hover:underline">
+          <Link to="/orders" className="hover:underline">
             Track your order
           </Link>
           <span>|</span>

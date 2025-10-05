@@ -1,1 +1,11 @@
 @import "tailwindcss";
+/* global.css or index.css */
+:root {
+    --color-primary: #F59E0B;   /* yellow-500 */
+    --color-primary-dark: #B45309; /* yellow-700 */
+    --color-text-primary: #111827; /* gray-900 */
+    --color-bg: #FFFFFF;
+    --color-bg-dark: #1F2937; /* gray-800 */
+    --color-accent: #3B82F6; /* blue-500 */
+  }
+  

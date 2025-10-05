@@ -299,7 +299,7 @@ const ProductPage = () => {
           </div>
 
           <p className="text-sm text-blue-700">
-            Sell on Martfury?{" "}
+            Sell on Jshop?{" "}
             <a href="#" className="underline">
               Register Now !
             </a>
