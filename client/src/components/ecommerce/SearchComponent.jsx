@@ -55,8 +55,8 @@ const SearchBar = () => {
 
   return (
     <div ref={wrapperRef} className="relative w-full max-w-3xl">
-      <div className="flex border border-gray-300 bg-white rounded overflow-hidden">
-        <select className="bg-transparent text-sm px-3 py-2 border-r outline-none">
+      <div className="flex bg-white overflow-hidden">
+        <select className="bg-transparent text-sm px-3 py-2 border-r border-gray-400 outline-none">
           <option value="all">All</option>
           <option value="electronics">Electronics</option>
           <option value="fashion">Fashion</option>

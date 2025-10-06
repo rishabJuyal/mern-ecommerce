@@ -6,6 +6,10 @@ import ProductCategories from "../components/ui/ProductCategories";
 import CategoriesSidebar from "../components/ecommerce/CategoriesSidebar";
 import ProductCard from "../components/ecommerce/ProductCard";
 
+import { ByCategoriesList } from "../constants/ByCategoriesList";
+import { ByBrandList } from "../constants/ByBrandList";
+import PriceFilter from "../components/ecommerce/PriceFliter";
+
 const bestSaleItems = [
   {
     id: 1,
@@ -52,41 +56,14 @@ const Home = () => {
       <BrandsStrip />
       <ProductCategories />
 
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-r from-red-700 to-black text-white rounded-3xl overflow-hidden shadow-2xl mt-20 flex flex-col md:flex-row items-center justify-between p-12 md:p-20 gap-10">
-        <div className="md:w-1/2 text-center md:text-left z-10">
-          <h1 className="text-4xl md:text-5xl font-extrabold leading-tight mb-6">
-            Elevate Your Shopping Experience
-          </h1>
-          <p className="mb-8 text-lg opacity-90 max-w-lg mx-auto md:mx-0">
-            Discover exclusive deals, top brands, and the best products all in
-            one place.
-          </p>
-          <Link
-            to="/shop"
-            className="inline-block bg-white text-red-600 font-bold py-3 px-8 rounded-lg shadow-lg hover:bg-gray-100 transition"
-          >
-            Start Shopping
-          </Link>
-        </div>
-
-        <div className="md:w-1/2 relative">
-          <img
-            src="https://images.unsplash.com/photo-1606813905944-dbdc2c8d16ff?auto=format&fit=crop&w=800&q=80"
-            alt="Shopping"
-            className="rounded-3xl object-cover w-full h-72 md:h-[400px] opacity-80 shadow-lg block"
-            loading="lazy"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent to-black rounded-3xl pointer-events-none"></div>
-        </div>
-      </section>
-
       {/* Sidebar + Best Sale Items */}
       <section className="mt-20">
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Sidebar */}
           <div className="w-full lg:w-1/4">
-            <CategoriesSidebar />
+            <CategoriesSidebar title="BY CATEGORIES" categories={ByCategoriesList} />
+            <CategoriesSidebar title="BY BRANDS" categories={ByBrandList} />
+            <PriceFilter />
           </div>
 
           {/* Products */}
@@ -103,7 +80,7 @@ const Home = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
               {bestSaleItems.map((item) => (
-                <ProductCard key={item.id} item={item} />
+                <ProductCard key={item.id} product={item} />
               ))}
             </div>
           </div>

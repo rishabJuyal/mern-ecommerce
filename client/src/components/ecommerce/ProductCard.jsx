@@ -1,36 +1,92 @@
-// components/ecommerce/ProductCard.jsx
 import React from "react";
+import { Link } from "react-router-dom";
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
 
-const ProductCard = ({ item }) => {
+// Function to render the star ratings
+const renderStars = (rating) => {
+  const stars = [];
+  for (let i = 1; i <= 5; i++) {
+    if (rating >= i) {
+      stars.push(<FaStar key={i} className="text-yellow-400" />);
+    } else if (rating >= i - 0.5) {
+      stars.push(<FaStarHalfAlt key={i} className="text-yellow-400" />);
+    } else {
+      stars.push(<FaRegStar key={i} className="text-yellow-400" />);
+    }
+  }
+  return stars;
+};
+
+const ProductCard = ({ product }) => {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl shadow-md hover:shadow-xl transition p-5 flex flex-col items-center">
-      <img
-        src={item.image}
-        alt={item.name}
-        className="w-full h-48 object-contain mb-5"
-        loading="lazy"
-      />
-      <h3 className="font-semibold text-gray-900 text-lg mb-2 text-center">
-        {item.name}
-      </h3>
-      <p className="text-red-600 font-extrabold text-xl mb-2">
-        ${item.price.toFixed(2)}
-      </p>
-      {/* Star rating */}
-      <div className="flex items-center">
-        {[...Array(5)].map((_, index) => (
-          <svg
-            key={index}
-            xmlns="http://www.w3.org/2000/svg"
-            className={`h-5 w-5 ${
-              index < item.rating ? "text-yellow-400" : "text-gray-300"
-            }`}
-            fill="currentColor"
-            viewBox="0 0 20 20"
+    <div className="bg-gray-100 flex flex-col w-full">
+      {/* Product image */}
+      {product.images && product.images.length > 0 ? (
+        <Link to={`/products/${product._id}`} className="relative w-full h-40 overflow-hidden">
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="object-cover w-full h-full transition-transform duration-400 ease-in-out transform hover:scale-105"
+            loading="lazy"
+          />
+          {product.images.length > 1 && (
+            <div className="absolute bottom-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 text-xs rounded">
+              +{product.images.length - 1} more
+            </div>
+          )}
+        </Link>
+      ) : (
+        <div className="bg-gray-200 w-full h-40 flex justify-center items-center text-gray-400 text-sm">
+          No Image
+        </div>
+      )}
+
+      {/* Product details */}
+      <div className="p-2 flex flex-col flex-grow">
+        {/* Product name */}
+        <Link
+          to={`/products/${product._id}`}
+          className="font-medium text-xs mb-1 h-9 hover:text-blue-600 transition"
+          style={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'normal',
+          }}
+        >
+          {product.name}
+        </Link>
+
+
+        {/* Category and stock status */}
+        <div className="flex items-center space-x-1 mb-1">
+          <span className="text-[9px] font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-full">
+            {product.category}
+          </span>
+          <span
+            className={`text-[9px] font-medium px-1.5 py-0.5 rounded-full ${product.stock > 0
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+              }`}
           >
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.974a1 1 0 00.95.69h4.178c.969 0 1.371 1.24.588 1.81l-3.385 2.46a1 1 0 00-.364 1.118l1.286 3.974c.3.921-.755 1.688-1.54 1.118l-3.385-2.46a1 1 0 00-1.176 0l-3.385 2.46c-.784.57-1.838-.197-1.539-1.118l1.285-3.974a1 1 0 00-.364-1.118L2.05 9.4c-.783-.57-.38-1.81.588-1.81h4.178a1 1 0 00.951-.69l1.286-3.974z" />
-          </svg>
-        ))}
+            {product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"}
+          </span>
+        </div>
+
+        {/* Ratings and reviews */}
+        <div className="flex items-center space-x-1 mb-1 text-nowrap text-xs">
+          {renderStars(product.averageRating)}
+          <span className="text-gray-600 ml-1">
+            ({product.numReviews} reviews)
+          </span>
+        </div>
+
+        {/* Product price */}
+        <div className="text-sm font-medium text-gray-900">
+          ${product.price.toFixed(2)}
+        </div>
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ const Navbar = () => {
   return (
     <header className="w-full font-sans">
       {/* Top Bar */}
-      <div className="bg-yellow-400 px-6 py-4 flex items-center justify-between">
+      <div className="bg-[var(--color-primary)] px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold text-black">
           <span className="text-black">J</span>
@@ -89,7 +89,7 @@ const Navbar = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="bg-yellow-400 px-6 py-2 border-t border-yellow-300 flex justify-between text-sm">
+      <div className="bg-[var(--color-primary)] px-6 py-2 border-t border-yellow-300 flex justify-between text-sm">
         <div className="flex items-center gap-8 text-black">
           <button className="flex items-center gap-2 font-medium">
             ☰ Shop by Department
