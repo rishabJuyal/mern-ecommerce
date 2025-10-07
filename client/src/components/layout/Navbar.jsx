@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ShoppingCart,
@@ -17,7 +17,10 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const  dispatch = useDispatch();
+  const location = useLocation();
   useEffect(()=>{
+    if(location.pathname==='/login') return;
+
     dispatch(fetchCart());
   },[])
 
