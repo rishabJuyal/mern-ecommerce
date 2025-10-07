@@ -69,19 +69,22 @@ export default function AddressPage() {
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow-md mt-8">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Your Addresses</h2>
-
+  
       {loading && <p className="text-blue-600">Loading...</p>}
       {error && <p className="text-red-600 mb-4">{error}</p>}
-
+  
       {profile && (
         <>
-          <AddressList
-            addresses={profile.address || []}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onSetDefault={handleSetDefault}
-          />
-
+          {/* Hide AddressList if the form is showing */}
+          {!showForm && (
+            <AddressList
+              addresses={profile.address || []}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onSetDefault={handleSetDefault}
+            />
+          )}
+  
           {!showForm && (
             <div className="mt-6">
               <button
@@ -92,13 +95,14 @@ export default function AddressPage() {
               </button>
             </div>
           )}
-
+  
+          {/* Show form only if showForm is true */}
           {showForm && (
             <div className="mt-8 border border-gray-300 rounded p-6 bg-gray-50">
               <h3 className="text-xl font-semibold mb-4 text-gray-700">
                 {editingAddress ? "Edit Address" : "Add Address"}
               </h3>
-
+  
               <AddressForm
                 initialData={editingAddress}
                 onSubmit={handleFormSubmit}
@@ -110,4 +114,5 @@ export default function AddressPage() {
       )}
     </div>
   );
+
 }

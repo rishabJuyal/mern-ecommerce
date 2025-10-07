@@ -1,55 +1,65 @@
-// src/components/AddressList.js
 import React from "react";
+import { FaEdit, FaTrash, FaStar } from "react-icons/fa";
 
 export default function AddressList({
   addresses = [],
   onEdit,
   onDelete,
-  onSetDefault
+  onSetDefault,
 }) {
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {addresses.length === 0 && (
-        <p className="text-gray-500">No addresses added yet.</p>
+        <p className="text-gray-500 text-center">No addresses added yet.</p>
       )}
-      {addresses.map(addr => (
+      {addresses.map((addr) => (
         <div
           key={addr._id}
-          className="border p-4 rounded-md flex justify-between items-start"
+          className="relative bg-white border border-gray-200 shadow-md rounded-lg p-6 transition hover:shadow-lg"
         >
-          <div>
-            <p className="font-semibold">{addr.fullName}</p>
-            <p>{addr.phoneNumber}</p>
-            <p>
+          {/* Top Right Default Badge */}
+          {addr.isDefault && (
+            <div className="absolute top-2 right-2 flex items-center text-yellow-600 text-xs font-semibold">
+              <FaStar className="mr-1 text-yellow-500" />
+              Default
+            </div>
+          )}
+
+          {/* Address Content */}
+          <div className="text-gray-800 space-y-2">
+            <div className="text-lg font-semibold">{addr.fullName}</div>
+            <div className="text-sm">{addr.phoneNumber}</div>
+            <div className="text-sm leading-snug">
               {addr.streetAddress}, {addr.city}
-              {addr.state ? `, ${addr.state}` : ""}, {addr.postalCode}, {addr.country}
-            </p>
-            {addr.isDefault && (
-              <span className="inline-block mt-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded">
-                Default
-              </span>
-            )}
+              {addr.state ? `, ${addr.state}` : ""}, {addr.postalCode},{" "}
+              {addr.country}
+            </div>
           </div>
-          <div className="space-x-2 text-right">
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-4 mt-4">
             {!addr.isDefault && (
               <button
                 onClick={() => onSetDefault(addr._id)}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-blue-600 hover:text-blue-800 transition"
+                title="Set as Default"
               >
-                Set Default
+                <FaStar size={16} />
               </button>
             )}
             <button
               onClick={() => onEdit(addr)}
-              className="text-sm text-yellow-600 hover:underline"
+              className="text-yellow-600 hover:text-yellow-700 transition"
+              title="Edit"
             >
-              Edit
+              <FaEdit size={16} />
             </button>
             <button
               onClick={() => onDelete(addr._id)}
-              className="text-sm text-red-600 hover:underline"
+              className="text-red-600 hover:text-red-700 transition"
+              title="Delete"
             >
-              Delete
+              <FaTrash size={16} />
             </button>
           </div>
         </div>
