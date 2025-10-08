@@ -1,4 +1,9 @@
 @import "tailwindcss";
+/* index.css */
+body {
+  font-family: 'Roboto', Arial, sans-serif;
+}
+
 /* global.css or index.css */
 :root {
     --color-primary: #FBBF24;   /* yellow-500 */

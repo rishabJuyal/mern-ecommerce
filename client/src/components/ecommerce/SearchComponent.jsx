@@ -1,12 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import api from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import api from "../../services/api";
+import { useNavigate } from "react-router-dom";
 
 const SearchBar = () => {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const navigate = useNavigate();
-  const wrapperRef = useRef(null); // 🔸 To detect clicks outside
+  const wrapperRef = useRef(null);
 
   const handleInputChange = async (e) => {
     const searchQuery = e.target.value;
@@ -27,16 +27,15 @@ const SearchBar = () => {
   const handleSearch = () => {
     if (!query.trim()) return;
     navigate(`/search?query=${encodeURIComponent(query)}`);
-    setSuggestions([]); // Hide dropdown after search
+    setSuggestions([]);
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSearch();
     }
   };
 
-  // 🔸 Hide suggestions on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
@@ -44,33 +43,36 @@ const SearchBar = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
   }, [query]);
 
   return (
-    <div ref={wrapperRef} className="relative w-full max-w-3xl">
-      <div className="flex bg-white overflow-hidden">
-        <select className="bg-transparent text-sm px-3 py-2 border-r border-gray-400 outline-none">
+    <div ref={wrapperRef} className="relative w-full max-w-3xl mx-auto">
+      {/* Search Box */}
+      <div className="flex items-stretch bg-white rounded-r overflow-hidden shadow-xs">
+        <select className="bg-gray-100 text-xs font-semibold px-3 pr-6 py-2 border-r border-gray-200 outline-none text-gray-700">
           <option value="all">All</option>
           <option value="electronics">Electronics</option>
           <option value="fashion">Fashion</option>
         </select>
+
         <input
           type="text"
           value={query}
           onChange={handleInputChange}
           placeholder="I'm shopping for..."
-          className="flex-grow px-4 py-2 outline-none text-sm"
+          className="flex-grow px-4 py-2 outline-none text-xs text-gray-800"
         />
+
         <button
           onClick={handleSearch}
-          className="bg-black text-white px-6 font-semibold text-sm hover:bg-gray-800"
+          className="bg-black text-white px-6 text-xs rounded-r font-medium hover:bg-gray-800 transition"
         >
           Search
         </button>
@@ -78,7 +80,7 @@ const SearchBar = () => {
 
       {/* Suggestions Dropdown */}
       {suggestions.length > 0 && (
-        <ul className="absolute z-10 left-0 right-0 bg-white border border-gray-300 rounded shadow-lg mt-1">
+        <ul className="absolute left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-y-auto z-50">
           {suggestions.map((s, i) => (
             <li
               key={i}
@@ -87,7 +89,7 @@ const SearchBar = () => {
                 setSuggestions([]);
                 navigate(`/search?query=${encodeURIComponent(s)}`);
               }}
-              className="px-4 py-2 cursor-pointer hover:bg-blue-100"
+              className="px-4 py-2 text-xs cursor-pointer hover:bg-gray-100 text-gray-800"
             >
               {s}
             </li>

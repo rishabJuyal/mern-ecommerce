@@ -46,7 +46,7 @@ const ProductCard = ({ product }) => {
         {/* Product name */}
         <Link
           to={`/products/${product._id}`}
-          className="font-medium text-xs mb-1 h-9 hover:text-blue-600 transition"
+          className="font-medium text-xs mb-1 h-8 hover:text-blue-600 transition"
           style={{
             display: '-webkit-box',
             WebkitLineClamp: 2,
