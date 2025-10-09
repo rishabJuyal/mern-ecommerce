@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate, NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   ShoppingCart,
@@ -51,9 +51,9 @@ const Navbar = () => {
         <div className="flex items-center lg:gap-7 gap-4 pl-4 text-sm text-black">
           <div
             className="relative cursor-pointer"
-            onClick={() => handleProtectedNavigate("/compare")}
+            onClick={() => handleProtectedNavigate("/orders")}
           >
-            <BarChart2 size={20} />
+            <BarChart2 size={26} />
             <span className="absolute -top-2 -right-2 bg-black text-white text-sm w-5 h-5 flex items-center justify-center rounded-full">
               0
             </span>
@@ -63,7 +63,7 @@ const Navbar = () => {
             className="relative cursor-pointer"
             onClick={() => handleProtectedNavigate("/wishlist")}
           >
-            <Heart size={20} />
+            <Heart size={26} />
             <span className="absolute -top-2 -right-2 bg-black text-white text-sm w-5 h-5 flex items-center justify-center rounded-full">
               0
             </span>
@@ -73,7 +73,7 @@ const Navbar = () => {
             className="relative cursor-pointer"
             onClick={() => handleProtectedNavigate("/cart")}
           >
-            <ShoppingCart size={20} />
+            <ShoppingCart size={26} />
             <span className="absolute -top-2 -right-2 bg-black text-white text-sm w-5 h-5 flex items-center justify-center rounded-full">
               {items.length}
             </span>
@@ -83,7 +83,7 @@ const Navbar = () => {
             className="cursor-pointer flex items-center gap-1"
             onClick={() => handleProtectedNavigate("/profile")}
           >
-            <User size={20} />
+            <User size={26} />
             <span className="text-sm font-medium whitespace-nowrap">
               {accessToken ? "Profile" : "Login / Register"}
             </span>
@@ -101,20 +101,47 @@ const Navbar = () => {
               className="absolute left-0 -top-3 w-0 h-[1px] bg-black transition-all duration-500 group-hover:w-full group-hover:left-0"
             ></span>
           </button>
-
-          <nav className="hidden md:flex gap-6">
-            <Link to="/" className="hover:underline whitespace-nowrap">
+          <nav className="hidden md:flex gap-6 font-semibold">
+            <NavLink
+              to="/"
+              className={({ isActive }) =>
+                isActive
+                  ? 'text-yellow-900' // Active state styles
+                  : 'text-gray-800 hover:text-yellow-900 transition-all duration-300' // Normal state styles
+              }
+            >
               Home
-            </Link>
-            <Link to="/shop" className="hover:underline whitespace-nowrap">
+            </NavLink>
+            <NavLink
+              to="/shop"
+              className={({ isActive }) =>
+                isActive
+                  ? 'text-yellow-900' // Active state styles
+                  : 'text-gray-800 hover:text-yellow-900 transition-all duration-300' // Normal state styles
+              }
+            >
               Shop
-            </Link>
-            <Link to="/pages" className="hover:underline whitespace-nowrap">
+            </NavLink>
+            <NavLink
+              to="/pages"
+              className={({ isActive }) =>
+                isActive
+                  ? 'text-yellow-900' // Active state styles
+                  : 'text-gray-800 hover:text-yellow-900 transition-all duration-300' // Normal state styles
+              }
+            >
               Pages
-            </Link>
-            <Link to="/blogs" className="hover:underline whitespace-nowrap">
+            </NavLink>
+            <NavLink
+              to="/blogs"
+              className={({ isActive }) =>
+                isActive
+                  ? 'text-yellow-900' // Active state styles
+                  : 'text-gray-800 hover:text-yellow-900 transition-all duration-300' // Normal state styles
+              }
+            >
               Blogs
-            </Link>
+            </NavLink>
           </nav>
         </div>
 

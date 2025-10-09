@@ -11,7 +11,7 @@ import LoginPage from "../pages/LoginPage";
 import ProtectedRoute from "../components/ProtectedRoute"; // import it
 import AddProduct from "../pages/admin/AddProduct";
 import RegisterPage from "../pages/Register";
-import ProductPage from "../features/products/ProductPage";
+import ProductPage from "../features/products/product-page/ProductPage";
 import PaymentSuccess from "../pages/PaymentSuccess";
 import Checkout from "../features/checkout/Checkout";
 import AddressPage from "../features/address/AddressPage";

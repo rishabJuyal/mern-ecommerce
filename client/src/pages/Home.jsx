@@ -9,6 +9,13 @@ import ProductCard from "../components/ecommerce/ProductCard";
 import { ByCategoriesList } from "../constants/ByCategoriesList";
 import { ByBrandList } from "../constants/ByBrandList";
 import PriceFilter from "../components/ecommerce/PriceFliter";
+import Services from "../components/ecommerce/services";
+import ProductAdvertisement from "../components/ecommerce/ProductAdvertisement";
+
+import promotion from '../assets/home/promotion.png';
+import promotion1 from '../assets/home/promotion_1.jpg';
+import promotion2 from '../assets/home/promotion_2.jpg';
+import TopPicks from "../components/ui/TopPicks";
 
 const bestSaleItems = [
   {
@@ -52,9 +59,10 @@ const Home = () => {
   return (
     <div className="container mx-auto py-12 px-4">
       {/* Carousel Section */}
-      <Carousel />
+      <ProductAdvertisement mainImage={promotion} smallImage1={promotion1} smallImage2={promotion2} />
+      <Services />
       <BrandsStrip />
-      <ProductCategories />
+      <TopPicks />
 
       {/* Sidebar + Best Sale Items */}
       <section className="mt-20">

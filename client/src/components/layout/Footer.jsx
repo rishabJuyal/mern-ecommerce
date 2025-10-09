@@ -9,7 +9,7 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="bg-[#f9f9f9] text-gray-800 pt-12 pb-8 border-t">
+    <footer className="bg-[#f9f9f9] text-gray-800 pt-12 pb-8 border-t border-gray-300">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
 
         {/* Contact Us */}
@@ -79,7 +79,7 @@ const Footer = () => {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t mt-12 pt-6 text-center text-sm text-gray-500">
+      <div className="border-t border-gray-300 mt-12 pt-6 text-center text-sm text-gray-500">
         &copy; {new Date().getFullYear()} JShop. All rights reserved.
       </div>
     </footer>

@@ -3,8 +3,7 @@ import React, { useState } from "react";
 const tabs = [
   "Description",
   "Specification",
-  "Vendor",
-  "Reviews (1)",
+  "Reviews",
   "Questions and Answers",
   "More Offers",
 ];
